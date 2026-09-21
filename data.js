@@ -28,39 +28,23 @@
    Por eso esta app NO usa esas cifras: usa una progresión real distinta,
    en español, con sus propias duraciones confirmadas (ver tabla abajo).
 
-   MEDITACIÓN — recurso principal, uno por semana (no 30 distintos, no
-   uno solo repetido sin variación):
+   MEDITACIÓN — recurso principal (usado los 30 días):
      Canal: "Meditaciones Sol Murias" (podcast de Spotify, español, autora
-     real y activa, contacto público solmurias@gmail.com). Serie titulada
+     real y activa, contacto público solmurias@gmail.com). Grabación única
      "Meditaciones Deja de Ser Tú — Joe Dispenza — Inducciones y
-     meditaciones de la 1 a la 4ta semana", con un episodio por semana:
-
-       Semana 1 — "Inducción de las partes del cuerpo — Semana 1"
-         Duración confirmada: 11:21. Es SOLO inducción (así la titula la
-         propia autora) — no la práctica completa de la semana.
-         URL directa al episodio NO fiable (llevaba a una página de
-         panel de creador, no de escucha pública — confirmado roto por
-         la propia usuaria). Se enlaza a la lista de reproducción real:
-         https://open.spotify.com/playlist/7bIZ7De2O7DCKh1wgeDybp
-
-       Semana 2 — "Meditación guiada — Semana 2"
-         Duración confirmada: 11:59. Meditación completa (incluye inducción).
-         URL: https://open.spotify.com/episode/31IcoTnKhTgviM0CYAyCke
-
-       Semana 3 — "Meditación guiada — Semana 3"
-         Duración confirmada: 8:11. Meditación completa.
-         URL directa al episodio NO verificada (mismo bloqueo técnico de
-         siempre al intentar abrir la página). Se enlaza a la lista de
-         reproducción real donde está publicado, con el título exacto:
-         https://open.spotify.com/playlist/7bIZ7De2O7DCKh1wgeDybp
-
-       Semana 4 — "Meditación guiada — Semana 4"
-         Duración confirmada: 18:03. Meditación completa.
-         URL directa al episodio NO verificada (mismo motivo). Mismo
-         enlace de la lista de reproducción, buscar "Semana 4".
-
-     Tipo: TERCERO en las 4 — inspiradas en el libro, NO son grabaciones
-     oficiales de Joe Dispenza.
+     meditaciones de la 1 a la 4ta semana" (1:02:22), que recorre la
+     inducción y las 4 semanas del método seguidas en una sola pista —
+     verificada directamente por la usuaria (el enlace abre correctamente).
+     Esto reproduce mejor el método oficial que usar 4 episodios sueltos:
+     la misma grabación, escuchando cada semana un poco más lejos, igual
+     que hace el producto oficial de pago.
+     URL: https://open.spotify.com/episode/038WmAyyNVGvTgLC9eE8oO
+     Tipo: TERCERO — inspirada en el libro, NO es oficial de Joe Dispenza.
+     Límite honesto: no hay marcas de tiempo verificadas de dónde termina
+     cada semana dentro de la pista (no se pudo abrir la página para
+     comprobarlo), así que la app da una instrucción relativa ("retoma un
+     poco antes de donde la dejaste y ve un poco más allá") en vez de
+     minutos exactos inventados.
 
      Alternativa (Semana 1, inducción del "agua ascendiendo", canal
      distinto, YouTube, español, tercero, duración no confirmada):
@@ -114,53 +98,6 @@ const MOODS = [
 ];
 
 const RESOURCES = {
-  "semana1-induccion": {
-    nombre: "Inducción de las partes del cuerpo — Semana 1",
-    autor: "Meditaciones Sol Murias (Spotify)",
-    tipo: "tercero",
-    tipoLabel: "Tercero — inspirada en el libro, no es oficial de Joe Dispenza",
-    idioma: "Español",
-    duracion: "11:21",
-    alcance: "Solo inducción (no la práctica completa de la semana)",
-    url: "https://open.spotify.com/playlist/7bIZ7De2O7DCKh1wgeDybp",
-    urlNota: "El enlace directo al episodio individual no es fiable (lleva a una página de creador, no de escucha). El botón abre la lista de reproducción real donde está publicado; busca \"Inducción de las partes del cuerpo — Semana 1\".",
-    objetivo: "Pasar de Beta a Alfa/Theta llevando la atención a las partes del cuerpo \"en el espacio\", tal como describe el libro."
-  },
-  "semana2-meditacion": {
-    nombre: "Meditación guiada — Semana 2",
-    autor: "Meditaciones Sol Murias (Spotify)",
-    tipo: "tercero",
-    tipoLabel: "Tercero — inspirada en el libro, no es oficial de Joe Dispenza",
-    idioma: "Español",
-    duracion: "11:59",
-    alcance: "Meditación completa (incluye la inducción)",
-    url: "https://open.spotify.com/episode/31IcoTnKhTgviM0CYAyCke",
-    objetivo: "Añade el trabajo de reconocer, admitir/declarar y entregar sobre la base de la inducción de la semana 1."
-  },
-  "semana3-meditacion": {
-    nombre: "Meditación guiada — Semana 3",
-    autor: "Meditaciones Sol Murias (Spotify)",
-    tipo: "tercero",
-    tipoLabel: "Tercero — inspirada en el libro, no es oficial de Joe Dispenza",
-    idioma: "Español",
-    duracion: "8:11",
-    alcance: "Meditación completa",
-    url: "https://open.spotify.com/playlist/7bIZ7De2O7DCKh1wgeDybp",
-    urlNota: "No se pudo verificar el enlace directo a este episodio individual — el botón abre la lista de reproducción real donde está publicado; busca \"Semana 3\".",
-    objetivo: "Añade observar la respuesta automática mientras ocurre y empezar a redirigirla."
-  },
-  "semana4-meditacion": {
-    nombre: "Meditación guiada — Semana 4",
-    autor: "Meditaciones Sol Murias (Spotify)",
-    tipo: "tercero",
-    tipoLabel: "Tercero — inspirada en el libro, no es oficial de Joe Dispenza",
-    idioma: "Español",
-    duracion: "18:03",
-    alcance: "Meditación completa",
-    url: "https://open.spotify.com/playlist/7bIZ7De2O7DCKh1wgeDybp",
-    urlNota: "No se pudo verificar el enlace directo a este episodio individual — el botón abre la lista de reproducción real donde está publicado; busca \"Semana 4\".",
-    objetivo: "Crear y ensayar la nueva identidad: la etapa más larga, con la mayor duración de las cuatro."
-  },
   "induccion-agua": {
     nombre: "Meditación \"Deja de ser tú\" — inducción del agua ascendiendo (alternativa, solo semana 1)",
     autor: "Encontrando el balance en mi vida (YouTube)",
@@ -171,6 +108,18 @@ const RESOURCES = {
     alcance: "Inducción alternativa",
     url: "https://www.youtube.com/watch?v=6Heps-97ZUI",
     objetivo: "Misma función que la inducción de partes del cuerpo: entrar en Alfa/Theta. Úsala si un día de la semana 1 quieres variar."
+  },
+  "semanas-1-4": {
+    nombre: "Meditaciones \"Deja de ser tú\" — Inducciones y meditaciones de la 1ª a la 4ª semana",
+    autor: "Meditaciones Sol Murias (Spotify)",
+    tipo: "tercero",
+    tipoLabel: "Tercero — inspirada en el libro, no es oficial de Joe Dispenza",
+    idioma: "Español",
+    duracion: "1:02:22 (grabación única con las 4 semanas seguidas)",
+    alcance: "Grabación completa: recorre la inducción y las 4 semanas del método en una sola pista — igual que la grabación oficial, que usa el mismo audio y avanzas más cada semana.",
+    url: "https://open.spotify.com/episode/038WmAyyNVGvTgLC9eE8oO",
+    urlNota: "Enlace verificado directamente (funciona al abrirlo).",
+    objetivo: "Un único recurso para todo el programa: cada semana escuchas un poco más de la misma grabación, en vez de cambiar de audio."
   },
   "oficial-playlist": {
     nombre: "Free Meditations by Dr Joe Dispenza (lista oficial)",
@@ -204,7 +153,8 @@ const DAYS = [
 // ============ ETAPA 1 — INDUCCIÓN (días 1-7) ============
 { day:1, title:"Primer contacto con la inducción", resumen:"Esta semana trabajas solo el Paso 1 del método: aprender a entrar en calma llevando la atención al cuerpo. Es normal que cueste los primeros días — es una habilidad, no un talento.",
   blocks:["intencion","meditacion","journaling","accion","cierre"],
-  meditacionRef:"semana1-induccion",
+  meditacionRef:"semanas-1-4",
+  meditacionExtra:"Escucha desde el minuto 0:00. Esta primera semana no hace falta que la escuches entera de una vez — para cuando notes una pausa clara o un cambio de bloque, ya has hecho la parte de esta semana. Escucha lo mismo cada día.",
   journaling:{ instruccion:"Antes de meditar, dedica 5 minutos a responder por escrito:", prompts:[
     "¿Qué pensamiento se repite más en tu cabeza en un día normal?",
     "¿En qué momento del día aparece con más fuerza?"
@@ -213,7 +163,7 @@ const DAYS = [
 
 { day:2, title:"Observar sin corregir", resumen:"Sigues con la misma inducción. Hoy el journaling se centra en las emociones habituales, no en los pensamientos.",
   blocks:["intencion","meditacion","journaling","accion","cierre"],
-  meditacionRef:"semana1-induccion",
+  meditacionRef:"semanas-1-4",
   journaling:{ instruccion:"5 minutos, sin corregir lo que escribas:", prompts:[
     "¿Qué emoción sientes con más frecuencia en un día normal?",
     "¿Qué la suele disparar?"
@@ -222,7 +172,7 @@ const DAYS = [
 
 { day:3, title:"El cuerpo como memoria", resumen:"El cuerpo repite reacciones aunque la mente no esté pensando en ello activamente. Hoy observas eso.",
   blocks:["intencion","meditacion","journaling","accion","cierre"],
-  meditacionRef:"semana1-induccion",
+  meditacionRef:"semanas-1-4",
   journaling:{ instruccion:"5 minutos:", prompts:[
     "¿Qué haces automáticamente cuando estás estresada, sin decidirlo (comer, revisar el móvil, callar, etc.)?",
     "¿Desde cuándo recuerdas hacerlo?"
@@ -231,7 +181,7 @@ const DAYS = [
 
 { day:4, title:"El entorno que sostiene el patrón", resumen:"Personas, lugares y rutinas refuerzan quién eres sin que te des cuenta.",
   blocks:["intencion","meditacion","journaling","accion","cierre"],
-  meditacionRef:"semana1-induccion",
+  meditacionRef:"semanas-1-4",
   journaling:{ instruccion:"5 minutos:", prompts:[
     "¿Qué persona o situación te hace volver más rápido a tu forma de ser habitual?",
     "¿Qué parte de tu entorno diario refuerza el patrón que quieres cambiar?"
@@ -240,7 +190,7 @@ const DAYS = [
 
 { day:5, title:"El beneficio oculto", resumen:"Seguimos igual muchas veces porque, aunque no queramos admitirlo, hay algo que ganamos con ello.",
   blocks:["intencion","meditacion","journaling","accion","cierre"],
-  meditacionRef:"semana1-induccion",
+  meditacionRef:"semanas-1-4",
   journaling:{ instruccion:"5 minutos, con honestidad:", prompts:[
     "¿Qué ganas (comodidad, seguridad, evitar algo) manteniéndote como estás ahora?",
     "¿Qué te costaría dejar de ganar eso?"
@@ -249,7 +199,7 @@ const DAYS = [
 
 { day:6, title:"El coste de seguir igual", resumen:"La otra cara: qué te está costando no cambiar.",
   blocks:["intencion","meditacion","journaling","accion","cierre"],
-  meditacionRef:"semana1-induccion",
+  meditacionRef:"semanas-1-4",
   journaling:{ instruccion:"5 minutos:", prompts:[
     "¿Qué te está costando (tiempo, dinero, salud, relaciones) seguir siendo quien eres ahora?",
     "¿Qué te gustaría poder decir dentro de 30 días que hoy no puedes decir?"
@@ -258,7 +208,7 @@ const DAYS = [
 
 { day:7, title:"Revisión — Paso 1 integrado", resumen:"Cierre de la primera semana de inducción antes de pasar al Paso 2.",
   blocks:["intencion","meditacion","journaling","cierre"],
-  meditacionRef:"semana1-induccion",
+  meditacionRef:"semanas-1-4",
   journaling:{ instruccion:"Revisa tus respuestas de los días 1 a 6 antes de escribir hoy:", prompts:[
     "¿Te resulta más fácil entrar en calma que el primer día?",
     "¿Qué patrón ha aparecido más veces esta semana en tus respuestas?",
@@ -268,8 +218,8 @@ const DAYS = [
 // ============ ETAPA 2 — RECONOCER, ADMITIR, ENTREGAR (días 8-14) ============
 { day:8, title:"Paso 2: Reconocer", resumen:"Esta semana añades tres pasos tras la inducción: reconocer el patrón, admitirlo y declararlo, y entregar el control sobre él. Hoy trabajas solo el primero: reconocer.",
   blocks:["intencion","meditacion","journaling","accion","cierre"],
-  meditacionRef:"semana2-meditacion",
-  meditacionExtra:"Tras la inducción, dedica 2-3 minutos a reconocer conscientemente el pensamiento repetitivo que identificaste el Día 1: obsérvalo sin actuar sobre él, solo nombrándolo.",
+  meditacionRef:"semanas-1-4",
+  meditacionExtra:"Retoma la grabación un poco antes de donde la dejaste la semana pasada, para no perder el hilo, y esta vez ve un poco más allá. Tras esa parte, dedica 2-3 minutos a reconocer conscientemente el pensamiento repetitivo que identificaste el Día 1: obsérvalo sin actuar sobre él, solo nombrándolo.",
   journaling:{ instruccion:"5 minutos:", prompts:[
     "¿Qué patrón concreto vas a trabajar esta semana (el que más se repite de lo que anotaste en la semana 1)?",
     "¿En qué situación de esta semana lo esperas ver aparecer?"
@@ -278,7 +228,7 @@ const DAYS = [
 
 { day:9, title:"Reconocer una emoción que te secuestra", resumen:"Sigues en el Paso 2, ahora sobre una emoción concreta.",
   blocks:["intencion","meditacion","journaling","tapping","accion","cierre"],
-  meditacionRef:"semana2-meditacion",
+  meditacionRef:"semanas-1-4",
   meditacionExtra:"Tras la inducción, reconoce sin juzgar la emoción que anotaste el Día 2.",
   journaling:{ instruccion:"5 minutos:", prompts:[
     "¿Qué emoción te \"secuestra\" con más facilidad?",
@@ -289,7 +239,7 @@ const DAYS = [
 
 { day:10, title:"Reconocer un comportamiento automático", resumen:"Paso 2 aplicado a un comportamiento, no a un pensamiento o emoción.",
   blocks:["intencion","meditacion","journaling","accion","cierre"],
-  meditacionRef:"semana2-meditacion",
+  meditacionRef:"semanas-1-4",
   meditacionExtra:"Tras la inducción, reconoce el comportamiento automático que anotaste el Día 3.",
   journaling:{ instruccion:"5 minutos:", prompts:[
     "¿Qué haces automáticamente que te gustaría dejar de hacer?",
@@ -299,7 +249,7 @@ const DAYS = [
 
 { day:11, title:"Paso 3: Admitir y declarar", resumen:"Admitir es reconocer en voz alta (o por escrito) el patrón. Declarar es afirmar el cambio que quieres.",
   blocks:["intencion","meditacion","journaling","accion","cierre"],
-  meditacionRef:"semana2-meditacion",
+  meditacionRef:"semanas-1-4",
   meditacionExtra:"Tras la inducción, completa mentalmente: \"Admito que...\" y después \"Declaro que a partir de ahora...\", con el patrón que has trabajado esta semana.",
   journaling:{ instruccion:"5 minutos, completa las frases por escrito:", prompts:[
     "Admito que...",
@@ -309,7 +259,7 @@ const DAYS = [
 
 { day:12, title:"Paso 4: Entregar", resumen:"Entregar es soltar el control sobre cómo o cuándo va a cambiar algo, en vez de forzarlo.",
   blocks:["intencion","meditacion","journaling","accion","cierre"],
-  meditacionRef:"semana2-meditacion",
+  meditacionRef:"semanas-1-4",
   meditacionExtra:"Tras la inducción, dedica un momento a soltar conscientemente la necesidad de controlar cómo se va a resolver el patrón que trabajas.",
   journaling:{ instruccion:"5 minutos:", prompts:[
     "¿Qué te cuesta más soltar: el control sobre el cómo, sobre el cuándo, o sobre lo que piensen los demás?",
@@ -319,7 +269,7 @@ const DAYS = [
 
 { day:13, title:"Reconocer, admitir, entregar — juntos", resumen:"Aplicas los tres pasos seguidos, en una situación real de hoy.",
   blocks:["intencion","meditacion","journaling","tapping","accion","cierre"],
-  meditacionRef:"semana2-meditacion",
+  meditacionRef:"semanas-1-4",
   meditacionExtra:"Tras la inducción, recorre los tres pasos con el patrón de esta semana: reconoce, admite y declara, entrega.",
   journaling:{ instruccion:"5 minutos:", prompts:[
     "Describe una situación de hoy donde puedas aplicar los tres pasos.",
@@ -330,7 +280,7 @@ const DAYS = [
 
 { day:14, title:"Revisión — Pasos 2 a 4 integrados", resumen:"Cierre de la segunda semana antes de pasar a observar y redirigir.",
   blocks:["intencion","meditacion","journaling","cierre"],
-  meditacionRef:"semana2-meditacion",
+  meditacionRef:"semanas-1-4",
   journaling:{ instruccion:"Revisa tus respuestas de los días 8 a 13:", prompts:[
     "¿Cuántas veces esta semana lograste reconocer el patrón en el momento en que ocurría?",
     "¿Qué te resulta más difícil: reconocer, declarar o entregar?",
@@ -340,8 +290,8 @@ const DAYS = [
 // ============ ETAPA 3 — OBSERVAR Y REDIRIGIR (días 15-21) ============
 { day:15, title:"Paso 5: Observar y recordar", resumen:"Esta semana añades observarte durante el día (no solo en la meditación) y usar una señal para redirigir la respuesta en el momento en que ocurre. Hoy defines esa señal.",
   blocks:["intencion","meditacion","journaling","duranteeldia","accion","cierre"],
-  meditacionRef:"semana3-meditacion",
-  meditacionExtra:"En la meditación de hoy, repasa mentalmente el patrón que llevas trabajando desde la semana 2 y decide una señal interna (una palabra, por ejemplo \"cambio\") para usar el resto del día, fuera de la meditación.",
+  meditacionRef:"semanas-1-4",
+  meditacionExtra:"Retoma la grabación un poco antes de donde la dejaste la semana pasada y ve un poco más allá. Después, repasa mentalmente el patrón que llevas trabajando desde la semana 2 y decide una señal interna (una palabra, por ejemplo \"cambio\") para usar el resto del día, fuera de la meditación.",
   journaling:{ instruccion:"5 minutos:", prompts:[
     "¿Qué señal (palabra o gesto) vas a usar esta semana para interrumpirte cuando aparezca el patrón?",
     "¿En qué momentos del día es más probable que aparezca?"
@@ -351,7 +301,7 @@ const DAYS = [
 
 { day:16, title:"Redirigir en una conversación", resumen:"Aplicas la señal de ayer a un tipo de situación concreto: una conversación.",
   blocks:["intencion","meditacion","journaling","duranteeldia","accion","cierre"],
-  meditacionRef:"semana3-meditacion",
+  meditacionRef:"semanas-1-4",
   journaling:{ instruccion:"5 minutos:", prompts:[
     "¿Cuántas veces notaste el patrón ayer, y en cuántas usaste la señal?",
     "¿En qué conversación de hoy es más probable que aparezca?"
@@ -361,7 +311,7 @@ const DAYS = [
 
 { day:17, title:"Redirigir ante una emoción", resumen:"Ahora aplicas la misma señal, pero al notar la emoción antes que el pensamiento o la palabra.",
   blocks:["intencion","meditacion","journaling","duranteeldia","accion","cierre"],
-  meditacionRef:"semana3-meditacion",
+  meditacionRef:"semanas-1-4",
   journaling:{ instruccion:"5 minutos:", prompts:[
     "¿La señal te está costando menos que el Día 15?",
     "¿Qué sensación física avisa, en tu cuerpo, de que el patrón está a punto de aparecer?"
@@ -371,7 +321,7 @@ const DAYS = [
 
 { day:18, title:"Redirigir bajo presión", resumen:"El patrón suele ganar cuando hay prisa o estrés. Hoy practicas la señal justo ahí.",
   blocks:["intencion","meditacion","journaling","tapping","duranteeldia","accion","cierre"],
-  meditacionRef:"semana3-meditacion",
+  meditacionRef:"semanas-1-4",
   journaling:{ instruccion:"5 minutos:", prompts:[
     "¿Qué ha cambiado en cómo reaccionas, aunque sea poco?",
     "¿En qué momento de prisa o estrés de hoy vas a poner especial atención?"
@@ -382,7 +332,7 @@ const DAYS = [
 
 { day:19, title:"Redirigir sin que nadie lo note", resumen:"La señal ya no necesita ser visible para los demás — se vuelve un gesto interno.",
   blocks:["intencion","meditacion","journaling","duranteeldia","accion","cierre"],
-  meditacionRef:"semana3-meditacion",
+  meditacionRef:"semanas-1-4",
   journaling:{ instruccion:"5 minutos:", prompts:[
     "¿Qué le dirías a la versión de ti de hace 19 días sobre esta semana?",
     "¿Qué patrón nuevo (distinto al original) has notado en ti esta semana?"
@@ -392,7 +342,7 @@ const DAYS = [
 
 { day:20, title:"Del esfuerzo a la costumbre", resumen:"Sexto día seguido de la misma práctica: empieza a comprobarse si la redirección se está volviendo más natural, con menos esfuerzo consciente.",
   blocks:["intencion","meditacion","journaling","duranteeldia","accion","cierre"],
-  meditacionRef:"semana3-meditacion",
+  meditacionRef:"semanas-1-4",
   journaling:{ instruccion:"5 minutos:", prompts:[
     "En una palabra, ¿cómo describirías el esfuerzo de redirigir hoy comparado con el Día 15?",
     "¿Qué necesitarías para que se vuelva completamente automático?"
@@ -402,7 +352,7 @@ const DAYS = [
 
 { day:21, title:"Revisión — Pasos 5 y 6 integrados", resumen:"Cierre de la tercera semana antes de pasar a crear y ensayar.",
   blocks:["intencion","meditacion","journaling","cierre"],
-  meditacionRef:"semana3-meditacion",
+  meditacionRef:"semanas-1-4",
   journaling:{ instruccion:"Compara tu respuesta del Día 1 con hoy antes de escribir:", prompts:[
     "¿Qué pensabas el Día 1 sobre este patrón? ¿Qué piensas ahora?",
     "¿Qué haces diferente hoy que no hacías al empezar?",
@@ -412,8 +362,8 @@ const DAYS = [
 // ============ ETAPA 4 — CREAR Y ENSAYAR (días 22-30) ============
 { day:22, title:"Paso 7: definir la identidad futura", resumen:"Última etapa: crear conscientemente quién quieres ser y ensayarlo mentalmente. Empieza por definir esa identidad con claridad.",
   blocks:["intencion","meditacion","journaling","gratitud","accion","cierre"],
-  meditacionRef:"semana4-meditacion",
-  meditacionExtra:"Tras la inducción, en vez de trabajar el patrón antiguo, dedica el resto de la sesión a imaginar en silencio a la persona que quieres ser — sin palabras, solo la sensación.",
+  meditacionRef:"semanas-1-4",
+  meditacionExtra:"Última semana: retoma la grabación un poco antes de donde la dejaste y escucha hasta el final. En la parte final, en vez de trabajar el patrón antiguo, deja que la grabación te lleve a imaginar en silencio a la persona que quieres ser — sin palabras, solo la sensación.",
   journaling:{ instruccion:"5-10 minutos. Antes de responder, relee lo que escribiste en Objetivos al empezar el programa:", prompts:[
     "Completa 5 veces: \"Soy una persona que...\" (conductas reales, no fantasías)",
     "¿Cuál de esas 5 frases es la más urgente de empezar a vivir?"
@@ -423,7 +373,7 @@ const DAYS = [
 
 { day:23, title:"Ensayo mental de una situación", resumen:"El ensayo mental es imaginar con detalle cómo actuarías distinto en una situación concreta, antes de que ocurra.",
   blocks:["intencion","meditacion","journaling","visualizacion","gratitud","accion","cierre"],
-  meditacionRef:"semana4-meditacion",
+  meditacionRef:"semanas-1-4",
   journaling:{ instruccion:"5 minutos:", prompts:[
     "Elige una situación de los próximos días donde sueles reaccionar como el \"viejo yo\". Descríbela.",
     "¿Cómo reaccionaría la persona que definiste ayer?"
@@ -434,7 +384,7 @@ const DAYS = [
 
 { day:24, title:"La emoción antes del resultado", resumen:"Dispenza insiste en sentir la emoción elevada (gratitud, por ejemplo) antes de que el resultado exista, como combustible del cambio.",
   blocks:["intencion","meditacion","journaling","gratitud","accion","cierre"],
-  meditacionRef:"semana4-meditacion",
+  meditacionRef:"semanas-1-4",
   meditacionExtra:"Tras la inducción, elige una emoción elevada (gratitud, calma, ilusión) y quédate con ella 5 minutos, sin pensar en cómo conseguirla — solo sintiéndola.",
   journaling:{ instruccion:"5 minutos:", prompts:[
     "¿Qué emoción elevada eliges hoy para tu ensayo?",
@@ -445,7 +395,7 @@ const DAYS = [
 
 { day:25, title:"Ensayo mental de un día completo", resumen:"Ampliando el ensayo: en vez de una situación, un día entero de tu futuro.",
   blocks:["intencion","meditacion","journaling","visualizacion","accion","cierre"],
-  meditacionRef:"semana4-meditacion",
+  meditacionRef:"semanas-1-4",
   journaling:{ instruccion:"5 minutos:", prompts:[
     "Describe un día normal de tu vida dentro de unos meses: cómo piensas, cómo decides, qué toleras y qué ya no.",
     "¿Qué detalle de ese día es el más vivo para ti?"
@@ -455,7 +405,7 @@ const DAYS = [
 
 { day:26, title:"Dinero y oportunidades", resumen:"El ensayo mental también se aplica a decisiones concretas, no solo a estados internos.",
   blocks:["intencion","meditacion","journaling","accion","cierre"],
-  meditacionRef:"semana4-meditacion",
+  meditacionRef:"semanas-1-4",
   journaling:{ instruccion:"5 minutos:", prompts:[
     "¿Qué habilidad tuya podrías convertir en ingresos y aún no has explorado?",
     "¿Qué oportunidad tienes delante y no has mirado por miedo o por costumbre?"
@@ -464,7 +414,7 @@ const DAYS = [
 
 { day:27, title:"Integración de las prácticas", resumen:"Antes de cerrar el programa, repasa qué te ha sostenido realmente.",
   blocks:["intencion","meditacion","journaling","gratitud","cierre"],
-  meditacionRef:"semana4-meditacion",
+  meditacionRef:"semanas-1-4",
   journaling:{ instruccion:"5 minutos:", prompts:[
     "De todo lo practicado (meditación, journaling, tapping, ensayo mental), ¿qué te está ayudando más a mantenerte centrada?",
     "¿Qué prácticas vas a dejar y cuáles quieres conservar?"
@@ -473,7 +423,7 @@ const DAYS = [
 
 { day:28, title:"Tu sistema de mantenimiento", resumen:"Elige, como máximo, 3 prácticas para sostener después del Día 30.",
   blocks:["intencion","meditacion","journaling","accion","cierre"],
-  meditacionRef:"semana4-meditacion",
+  meditacionRef:"semanas-1-4",
   journaling:{ instruccion:"5 minutos:", prompts:[
     "¿Cuáles son las 3 prácticas (de todas las de este programa) con las que te quedas?",
     "¿Con qué frecuencia realista vas a hacer cada una?"
@@ -482,7 +432,7 @@ const DAYS = [
 
 { day:29, title:"Plan de 90 días", resumen:"El ensayo mental de hoy se extiende más allá del programa: qué vas a construir en los próximos 3 meses.",
   blocks:["intencion","meditacion","journaling","visualizacion","accion","cierre"],
-  meditacionRef:"semana4-meditacion",
+  meditacionRef:"semanas-1-4",
   journaling:{ instruccion:"5-10 minutos. Relee tus objetivos del Día 1:", prompts:[
     "Completa: \"Durante los próximos 90 días voy a...\" (máximo 3 objetivos concretos)"
   ]},
@@ -491,7 +441,7 @@ const DAYS = [
 
 { day:30, title:"Cierre e informe final", resumen:"Último día. Revisa el camino completo antes de responder.",
   blocks:["intencion","meditacion","journaling","gratitud","cierre"],
-  meditacionRef:"semana4-meditacion",
+  meditacionRef:"semanas-1-4",
   journaling:{ instruccion:"Relee tus objetivos del Día 1 y tu revisión del Día 21 antes de escribir:", prompts:[
     "¿Qué hiciste en estos 30 días que antes no hacías?",
     "¿Qué pensamiento ha cambiado de verdad?",
