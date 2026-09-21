@@ -213,7 +213,11 @@ function updateScreenClasses() {
   $$(".navitem").forEach(b => b.classList.toggle("active", b.dataset.screen === currentScreen));
 }
 
-function setScreen(name) { navigate({ screen: name }); }
+function setScreen(name) {
+  // el atajo "HOY" de la barra inferior siempre vuelve al día activo real,
+  // nunca se queda en un día al que hayas saltado desde Programa.
+  navigate(name === "hoy" ? { screen: name, viewDay: null, block: null } : { screen: name });
+}
 
 window.addEventListener("popstate", (e) => {
   applyNavState(e.state || { screen: "hoy", block: null, viewDay: null });
@@ -234,7 +238,8 @@ function toast(msg) {
 function render() {
   updateScreenClasses();
   if (currentScreen === "hoy") {
-    if (viewDayNumber) renderDiaLectura(viewDayNumber); else renderHoy();
+    const day = viewDayNumber || pickActiveDay();
+    renderDayScreen(day, viewDayNumber != null);
   }
   if (currentScreen === "progreso") renderProgreso();
   if (currentScreen === "diario") renderDiario();
@@ -243,12 +248,12 @@ function render() {
   if (currentScreen === "programa") renderPrograma();
 }
 
-/* ---------- Pantalla HOY ---------- */
+/* ---------- Pantalla del día (HOY, o cualquier día elegido desde Programa) ---------- */
 
-function renderHoy() {
-  activeDayForToday = pickActiveDay();
-  const d = dayData(activeDayForToday);
-  const rec = getDayRecord(activeDayForToday);
+function renderDayScreen(day, isJump) {
+  activeDayForToday = day;
+  const d = dayData(day);
+  const rec = getDayRecord(day);
   const root = $("#screen-hoy");
 
   const pct = Math.round((completedDaysCount() / 30) * 100);
@@ -261,7 +266,7 @@ function renderHoy() {
 
   root.innerHTML = `
     <header class="hoy-header">
-      <div class="brand">MI TRANSFORMACIÓN</div>
+      ${isJump ? `<button class="btn-back" id="back-from-day">‹ Atrás</button>` : `<div class="brand">MI TRANSFORMACIÓN</div>`}
       <div class="daycount">Día ${d.day} de 30</div>
       <div class="progressbar"><div class="progressbar-fill" style="width:${pct}%"></div></div>
       <div class="streakline">Racha actual: ${streaks.current} día${streaks.current===1?"":"s"}</div>
@@ -278,7 +283,7 @@ function renderHoy() {
       ${d.blocks.map(b => renderBlockRow(b, rec)).join("")}
     </section>
 
-    ${allDone ? `<div class="daydone">Día completado. Mañana continuamos.</div>` : ""}
+    ${allDone ? `<div class="daydone">Día completado.</div>` : ""}
 
     ${openBlockKey ? `<button class="btn-back" id="close-block">‹ Atrás</button>` : ""}
     <div id="block-detail" class="block-detail"></div>
@@ -287,6 +292,7 @@ function renderHoy() {
   $("#btn-empezar-dia")?.addEventListener("click", () => openBlock(d.blocks[0]));
   $$(".blockrow").forEach(row => row.addEventListener("click", () => openBlock(row.dataset.block)));
   $("#close-block")?.addEventListener("click", () => history.back());
+  $("#back-from-day")?.addEventListener("click", () => history.back());
 
   if (openBlockKey) renderBlockDetail(openBlockKey, d, rec);
 }
@@ -328,7 +334,7 @@ function markBlockDone(key, day) {
     openBlockKey = null;
     syncHistory();
     render();
-    toast("Día completado. Mañana continuamos.");
+    toast("Día completado.");
     return;
   }
   saveState();
@@ -604,35 +610,6 @@ function renderPrograma() {
       navigate({ screen: "hoy", viewDay: day, block: null });
     });
   });
-}
-
-function renderDiaLectura(day) {
-  const d = dayData(day);
-  const rec = getDayRecord(day);
-  const root = $("#screen-hoy");
-  const journalHtml = d.blocks.includes("journaling") ? `
-      <h2>Journaling</h2>
-      ${d.journaling.prompts.map((p,i) => `<label class="field-label">${p}</label><p class="readonly-answer">${escapeHtml(rec.journalAnswers?.[i] || "—")}</p>`).join("")}` : "";
-  const tappingHtml = d.blocks.includes("tapping") ? `
-      <h2>Tapping</h2>
-      <p class="readonly-answer">${escapeHtml(rec.tappingNote || "—")}</p>` : "";
-  const accionHtml = d.blocks.includes("accion") ? `
-      <h2>Acción</h2>
-      <p><strong>${d.accion.titulo}</strong></p>
-      <p class="readonly-answer">${escapeHtml(rec.actionNote || (rec.actionDone ? "Hecho." : "—"))}</p>` : "";
-  root.innerHTML = `
-    <header class="hoy-header">
-      <button class="btn-back" id="back-from-day">‹ Volver</button>
-      <div class="daycount">Día ${d.day} de 30</div>
-    </header>
-    <section class="today-card">
-      <div class="weektag">Semana ${weekOf(d.day).n} · ${weekOf(d.day).title}</div>
-      <h1 class="daytitle">${d.title}</h1>
-      <p class="daymeta">${d.resumen}</p>
-    </section>
-    <div class="detail-panel">${journalHtml}${tappingHtml}${accionHtml}</div>
-  `;
-  $("#back-from-day").addEventListener("click", () => history.back());
 }
 
 /* ---------- Diario ---------- */

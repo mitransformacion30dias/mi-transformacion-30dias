@@ -1,4 +1,4 @@
-const CACHE_NAME = "mi-transformacion-v4";
+const CACHE_NAME = "mi-transformacion-v5";
 const ASSETS = [
   "./",
   "./index.html",
