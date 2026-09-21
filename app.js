@@ -1,9 +1,20 @@
 /* app.js — Mi Transformación
    Todo el estado vive en localStorage, en este dispositivo. Sin red, sin cuentas. */
 
-const STORAGE_KEY = "mt_state_v1";
+const STORAGE_KEY = "mt_state_v2";
 const $ = (sel, root=document) => root.querySelector(sel);
 const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+
+const BLOCK_LABELS = {
+  intencion: "Intención del día",
+  meditacion: "Meditación",
+  journaling: "Journaling",
+  tapping: "Tapping",
+  gratitud: "Gratitud",
+  visualizacion: "Ensayo mental",
+  accion: "Acción",
+  cierre: "Cierre del día"
+};
 
 function todayISO() {
   const d = new Date();
@@ -16,29 +27,33 @@ function defaultState() {
     currentDay: 1,
     startedAt: null,
     reminderTime: null,
-    goals: [],          // {id, name, desc, why, nextAction, status, notes}
-    plan90: [],          // strings, max 3
-    practices28: [],      // strings, max 3
-    days: {},            // per-day record, keyed by day number as string
-    journalLog: [],       // flattened list for the DIARIO screen: {day, date, answers[]}
+    objetivos: { cambiar:"", crear:"", sentir:"", ser:"", resultado:"" },
+    plan90: [],
+    practices28: [],
+    days: {},
+    journalLog: [],
     bestStreak: 0
   };
 }
 
-function emptyDayRecord() {
+function emptyDayRecord(day) {
+  const d = dayData(day);
+  const completedBlocks = {};
+  (d ? d.blocks : []).forEach(b => { completedBlocks[b] = false; });
   return {
-    completedBlocks: { intencion:false, meditacion:false, journaling:false, tapping:false, accion:false, cierre:false },
-    meditationSeconds: 0,
+    completedBlocks,
     meditationDone: false,
     externalMeditation: false,
     journalAnswers: [],
     tappingNote: "",
+    visualizacionDone: false,
+    gratitudNote: "",
     actionDone: false,
     actionNote: "",
     mood: null,
     moodNote: "",
-    dateCompleted: null,   // ISO date when the day block "cierre" was completed
-    dateTouched: null      // ISO date of first interaction, for streak/history
+    dateCompleted: null,
+    dateTouched: null
   };
 }
 
@@ -67,7 +82,14 @@ function saveState() {
 
 function getDayRecord(day) {
   const key = String(day);
-  if (!state.days[key]) state.days[key] = emptyDayRecord();
+  if (!state.days[key]) state.days[key] = emptyDayRecord(day);
+  // por si el día ya existía de una versión anterior con otros bloques
+  const d = dayData(day);
+  if (d) {
+    d.blocks.forEach(b => {
+      if (!(b in state.days[key].completedBlocks)) state.days[key].completedBlocks[b] = false;
+    });
+  }
   return state.days[key];
 }
 
@@ -89,8 +111,6 @@ function completedDaysCount() {
 }
 
 function computeStreaks() {
-  // racha actual: días consecutivos (por fecha de calendario) con cierre completado,
-  // contando hacia atrás desde hoy o ayer.
   const completedDates = Object.values(state.days)
     .filter(d => d.dateCompleted)
     .map(d => d.dateCompleted)
@@ -101,16 +121,12 @@ function computeStreaks() {
   let current = 0;
   let cursor = new Date();
   cursor.setHours(0,0,0,0);
-  // si hoy no está completado, empezamos a contar desde ayer
-  if (!dateSet.has(todayISO())) {
-    cursor.setDate(cursor.getDate() - 1);
-  }
+  if (!dateSet.has(todayISO())) cursor.setDate(cursor.getDate() - 1);
   while (dateSet.has(cursor.toISOString().slice(0,10))) {
     current++;
     cursor.setDate(cursor.getDate() - 1);
   }
 
-  // mejor racha histórica: recorrer fechas ordenadas
   let best = 0, run = 0, prev = null;
   for (const iso of completedDates) {
     if (prev) {
@@ -128,23 +144,18 @@ function computeStreaks() {
   return { current, best };
 }
 
-function totalMeditationMinutes() {
-  const secs = Object.values(state.days).reduce((sum, d) => sum + (d.meditationSeconds || 0), 0);
-  return Math.round(secs / 60);
+function totalMeditationsDone() {
+  return Object.values(state.days).filter(d => d.meditationDone).length;
 }
-
 function totalActions() {
   return Object.values(state.days).filter(d => d.actionDone).length;
 }
-
 function totalTappingSessions() {
   return Object.values(state.days).filter(d => d.tappingNote && d.tappingNote.trim().length > 0).length;
 }
-
 function totalJournalDays() {
   return Object.values(state.days).filter(d => d.journalAnswers && d.journalAnswers.some(a => a && a.trim().length > 0)).length;
 }
-
 function averageMood() {
   const moods = Object.values(state.days).map(d => d.mood).filter(Boolean);
   if (moods.length === 0) return null;
@@ -157,13 +168,14 @@ function averageMood() {
   return MOODS.find(m => m.key === nearest.key);
 }
 
-/* ---------- Navegación ---------- */
+/* ---------- Navegación (con historial real) ---------- */
 
 let currentScreen = "hoy";
 let activeDayForToday = 1;
+let openBlockKey = null;
+let viewDayNumber = null;
 
 function pickActiveDay() {
-  // el día activo es el primer día del programa que aún no tiene cierre completado
   for (const d of DAYS) {
     const rec = state.days[String(d.day)];
     if (!rec || !rec.dateCompleted) return d.day;
@@ -171,14 +183,42 @@ function pickActiveDay() {
   return 30;
 }
 
-function setScreen(name) {
-  currentScreen = name;
-  $$(".screen").forEach(s => s.classList.remove("active"));
-  $(`#screen-${name}`).classList.add("active");
-  $$(".navitem").forEach(b => b.classList.toggle("active", b.dataset.screen === name));
+function navState() { return { screen: currentScreen, block: openBlockKey, viewDay: viewDayNumber }; }
+
+function applyNavState(s) {
+  currentScreen = (s && s.screen) || "hoy";
+  openBlockKey = (s && s.block) || null;
+  viewDayNumber = (s && s.viewDay) || null;
+}
+
+function navigate(patch) {
+  const current = navState();
+  const next = Object.assign({}, current, patch);
+  if (patch.screen && patch.screen !== current.screen) {
+    if (patch.block === undefined) next.block = null;
+    if (patch.viewDay === undefined) next.viewDay = null;
+  }
+  applyNavState(next);
   render();
   window.scrollTo(0,0);
+  history.pushState(next, "", location.href);
 }
+
+function syncHistory() { history.replaceState(navState(), "", location.href); }
+
+function updateScreenClasses() {
+  $$(".screen").forEach(s => s.classList.remove("active"));
+  $(`#screen-${currentScreen}`)?.classList.add("active");
+  $$(".navitem").forEach(b => b.classList.toggle("active", b.dataset.screen === currentScreen));
+}
+
+function setScreen(name) { navigate({ screen: name }); }
+
+window.addEventListener("popstate", (e) => {
+  applyNavState(e.state || { screen: "hoy", block: null, viewDay: null });
+  render();
+  window.scrollTo(0,0);
+});
 
 function toast(msg) {
   const t = $("#toast");
@@ -188,16 +228,21 @@ function toast(msg) {
   toast._t = setTimeout(() => t.classList.remove("show"), 2600);
 }
 
-/* ---------- Render: pantalla HOY ---------- */
+/* ---------- Render principal ---------- */
 
 function render() {
-  if (currentScreen === "hoy") renderHoy();
+  updateScreenClasses();
+  if (currentScreen === "hoy") {
+    if (viewDayNumber) renderDiaLectura(viewDayNumber); else renderHoy();
+  }
   if (currentScreen === "progreso") renderProgreso();
   if (currentScreen === "diario") renderDiario();
   if (currentScreen === "objetivos") renderObjetivos();
   if (currentScreen === "mas") renderMas();
   if (currentScreen === "programa") renderPrograma();
 }
+
+/* ---------- Pantalla HOY ---------- */
 
 function renderHoy() {
   activeDayForToday = pickActiveDay();
@@ -209,8 +254,9 @@ function renderHoy() {
   const streaks = computeStreaks();
   const week = weekOf(d.day);
 
-  const blocksDone = Object.values(rec.completedBlocks).filter(Boolean).length;
-  const allDone = blocksDone === 6;
+  const totalBlocks = d.blocks.length;
+  const doneBlocks = d.blocks.filter(b => rec.completedBlocks[b]).length;
+  const allDone = doneBlocks === totalBlocks;
 
   root.innerHTML = `
     <header class="hoy-header">
@@ -221,57 +267,50 @@ function renderHoy() {
     </header>
 
     <section class="today-card">
-      <div class="weektag">Semana ${week.n} · ${week.title}</div>
+      <div class="weektag">Semana ${week.n} · ${week.title} <span class="weeksub">(${week.subtitle})</span></div>
       <h1 class="daytitle">${d.title}</h1>
-      <p class="daymeta">Meditación sugerida: ${d.meditationLabel}</p>
+      <p class="daymeta">${d.resumen}</p>
       ${!blocksAnyStarted(rec) ? `<button class="btn-primary" id="btn-empezar-dia">EMPEZAR MI DÍA</button>` : ""}
     </section>
 
     <section class="blocklist">
-      ${renderBlockRow("intencion", "Intención del día", rec, activeDayForToday)}
-      ${renderBlockRow("meditacion", "Meditación", rec, activeDayForToday)}
-      ${renderBlockRow("journaling", "Journaling", rec, activeDayForToday)}
-      ${renderBlockRow("tapping", "Tapping", rec, activeDayForToday)}
-      ${renderBlockRow("accion", "Acción", rec, activeDayForToday)}
-      ${renderBlockRow("cierre", "Cierre del día", rec, activeDayForToday)}
+      ${d.blocks.map(b => renderBlockRow(b, rec)).join("")}
     </section>
 
     ${allDone ? `<div class="daydone">Día completado. Mañana continuamos.</div>` : ""}
 
+    ${openBlockKey ? `<button class="btn-back" id="close-block">‹ Cerrar</button>` : ""}
     <div id="block-detail" class="block-detail"></div>
   `;
 
-  $("#btn-empezar-dia")?.addEventListener("click", () => openBlock("intencion"));
-  $$(".blockrow").forEach(row => {
-    row.addEventListener("click", () => openBlock(row.dataset.block));
-  });
+  $("#btn-empezar-dia")?.addEventListener("click", () => openBlock(d.blocks[0]));
+  $$(".blockrow").forEach(row => row.addEventListener("click", () => openBlock(row.dataset.block)));
+  $("#close-block")?.addEventListener("click", () => history.back());
 
   if (openBlockKey) renderBlockDetail(openBlockKey, d, rec);
 }
 
 function blocksAnyStarted(rec) {
-  return Object.values(rec.completedBlocks).some(Boolean) || rec.meditationSeconds > 0 ||
+  return Object.values(rec.completedBlocks).some(Boolean) || rec.meditationDone ||
     (rec.journalAnswers && rec.journalAnswers.some(a => a && a.trim())) || rec.tappingNote || rec.actionDone;
 }
 
-function renderBlockRow(key, label, rec, day) {
+function renderBlockRow(key, rec) {
   const done = rec.completedBlocks[key];
-  const disabled = key !== "intencion" && key !== "cierre" ? "" : "";
   return `
     <button class="blockrow ${done?'done':''}" data-block="${key}">
       <span class="check">${done ? "☑" : "☐"}</span>
-      <span class="blocklabel">${label}</span>
+      <span class="blocklabel">${BLOCK_LABELS[key]}</span>
       <span class="chev">›</span>
     </button>
   `;
 }
 
-let openBlockKey = null;
-
 function openBlock(key) {
-  openBlockKey = openBlockKey === key ? null : key;
-  render();
-  if (openBlockKey) {
+  if (openBlockKey === key) {
+    history.back();
+  } else {
+    navigate({ block: key });
     setTimeout(() => $("#block-detail")?.scrollIntoView({ behavior:"smooth", block:"start" }), 30);
   }
 }
@@ -280,10 +319,13 @@ function markBlockDone(key, day) {
   const rec = getDayRecord(day);
   rec.completedBlocks[key] = true;
   touchDay(day);
-  if (key === "cierre") {
+  const d = dayData(day);
+  const allDone = d.blocks.every(b => rec.completedBlocks[b]);
+  if (key === "cierre" || allDone) {
     rec.dateCompleted = todayISO();
     saveState();
     openBlockKey = null;
+    syncHistory();
     render();
     toast("Día completado. Mañana continuamos.");
     return;
@@ -299,115 +341,56 @@ function renderBlockDetail(key, d, rec) {
       <div class="detail-panel">
         <h2>Intención del día</h2>
         <p class="detail-sub">${d.title}</p>
-        <p>Hoy dedica tu práctica a esto. No necesitas hacer nada más que lo que aparece en las siguientes secciones.</p>
+        <p>${d.resumen}</p>
         <button class="btn-secondary" data-done="intencion">Marcar como leído</button>
       </div>`;
-  } else if (key === "meditacion") {
-    renderMeditacion(host, d, rec);
-  } else if (key === "journaling") {
-    renderJournaling(host, d, rec);
-  } else if (key === "tapping") {
-    renderTapping(host, d, rec);
-  } else if (key === "accion") {
-    renderAccion(host, d, rec);
-  } else if (key === "cierre") {
-    renderCierre(host, d, rec);
-  }
-  $$("[data-done]", host).forEach(btn => {
-    btn.addEventListener("click", () => markBlockDone(btn.dataset.done, d.day));
-  });
+  } else if (key === "meditacion") renderMeditacion(host, d, rec);
+  else if (key === "journaling") renderJournaling(host, d, rec);
+  else if (key === "tapping") renderTapping(host, d, rec);
+  else if (key === "gratitud") renderGratitud(host, d, rec);
+  else if (key === "visualizacion") renderVisualizacion(host, d, rec);
+  else if (key === "accion") renderAccion(host, d, rec);
+  else if (key === "cierre") renderCierre(host, d, rec);
+
+  $$("[data-done]", host).forEach(btn => btn.addEventListener("click", () => markBlockDone(btn.dataset.done, d.day)));
 }
 
-/* ---------- Meditación ---------- */
-
-let timerInterval = null;
-let timerSeconds = 0;
-let timerRunning = false;
+/* ---------- Meditación: recurso real + enlace externo, sin reproductor propio ---------- */
 
 function renderMeditacion(host, d, rec) {
-  const totalDefault = d.meditationMin * 60;
-  if (timerSeconds === 0 && !rec.meditationDone) timerSeconds = totalDefault;
+  const res = RESOURCES[d.meditacionRef];
   host.innerHTML = `
     <div class="detail-panel">
       <h2>Meditación</h2>
-      <p class="detail-sub">Duración sugerida: ${d.meditationLabel}</p>
-      <div class="timer-display" id="timer-display">${formatTime(timerSeconds)}</div>
-      <div class="timer-controls">
-        <button class="btn-secondary" id="timer-startpause">${timerRunning ? "Pausar" : "Iniciar"}</button>
-        <button class="btn-ghost" id="timer-reset">Reiniciar</button>
+      <div class="resource-card">
+        <div class="resource-name">${res.nombre}</div>
+        <div class="resource-row"><span class="resource-label">Autor</span><span>${res.autor}</span></div>
+        <div class="resource-row"><span class="resource-label">Tipo</span><span class="resource-tag ${res.tipo}">${res.tipoLabel}</span></div>
+        <div class="resource-row"><span class="resource-label">Idioma</span><span>${res.idioma}</span></div>
+        <div class="resource-row"><span class="resource-label">Duración</span><span>${res.duracion}</span></div>
+        <p class="resource-objetivo">${res.objetivo}</p>
+        <a class="btn-primary resource-link" href="${res.url}" target="_blank" rel="noopener">INICIAR MEDITACIÓN</a>
       </div>
-      <button class="btn-secondary" id="timer-finish">Finalizar práctica</button>
-      <div class="divider"></div>
-      <button class="btn-ghost" id="use-external">Usaré una meditación externa</button>
-      ${rec.meditationDone ? `<p class="confirm-msg">Práctica completada.</p>` : ""}
+      ${d.meditacionExtra ? `<div class="meditacion-extra"><p class="detail-sub">Después de la grabación:</p><p>${escapeHtml(d.meditacionExtra)}</p></div>` : ""}
+      <p class="note-small"><a href="${RESOURCES["oficial-playlist"].url}" target="_blank" rel="noopener">Prefiero la meditación oficial gratuita de Joe Dispenza (en inglés) →</a></p>
+      <button class="btn-secondary" data-done="meditacion" id="med-done-btn">Ya he practicado</button>
+      ${rec.completedBlocks.meditacion ? `<p class="confirm-msg">Práctica registrada.</p>` : ""}
     </div>
   `;
-  $("#timer-startpause").addEventListener("click", toggleTimer);
-  $("#timer-reset").addEventListener("click", () => { resetTimer(d); });
-  $("#timer-finish").addEventListener("click", () => finishMeditation(d, false));
-  $("#use-external").addEventListener("click", () => finishMeditation(d, true));
-}
-
-function formatTime(s) {
-  const h = String(Math.floor(s/3600)).padStart(2,"0");
-  const m = String(Math.floor((s%3600)/60)).padStart(2,"0");
-  const sec = String(s%60).padStart(2,"0");
-  return `${h}:${m}:${sec}`;
-}
-
-function toggleTimer() {
-  timerRunning = !timerRunning;
-  if (timerRunning) {
-    timerInterval = setInterval(() => {
-      if (timerSeconds > 0) {
-        timerSeconds--;
-        const disp = $("#timer-display");
-        if (disp) disp.textContent = formatTime(timerSeconds);
-      } else {
-        clearInterval(timerInterval);
-        timerRunning = false;
-      }
-    }, 1000);
-  } else {
-    clearInterval(timerInterval);
-  }
-  const btn = $("#timer-startpause");
-  if (btn) btn.textContent = timerRunning ? "Pausar" : "Iniciar";
-}
-
-function resetTimer(d) {
-  clearInterval(timerInterval);
-  timerRunning = false;
-  timerSeconds = d.meditationMin * 60;
-  render();
-}
-
-function finishMeditation(d, external) {
-  clearInterval(timerInterval);
-  timerRunning = false;
-  const rec = getDayRecord(d.day);
-  const elapsed = external ? d.meditationMin * 60 : (d.meditationMin*60 - timerSeconds);
-  rec.meditationSeconds = Math.max(rec.meditationSeconds, elapsed > 0 ? elapsed : d.meditationMin*60);
-  rec.meditationDone = true;
-  rec.externalMeditation = external;
-  rec.completedBlocks.meditacion = true;
-  timerSeconds = 0;
-  touchDay(d.day);
-  saveState();
-  render();
-  toast("Práctica completada.");
+  $("#med-done-btn").addEventListener("click", () => { rec.meditationDone = true; });
 }
 
 /* ---------- Journaling ---------- */
 
 function renderJournaling(host, d, rec) {
-  if (!rec.journalAnswers || rec.journalAnswers.length !== d.prompts.length) {
-    rec.journalAnswers = d.prompts.map((_, i) => rec.journalAnswers?.[i] || "");
+  if (!rec.journalAnswers || rec.journalAnswers.length !== d.journaling.prompts.length) {
+    rec.journalAnswers = d.journaling.prompts.map((_, i) => rec.journalAnswers?.[i] || "");
   }
   host.innerHTML = `
     <div class="detail-panel">
       <h2>Journaling</h2>
-      ${d.prompts.map((p, i) => `
+      <p class="detail-sub">${d.journaling.instruccion}</p>
+      ${d.journaling.prompts.map((p, i) => `
         <label class="field-label">${p}</label>
         <textarea class="field-textarea" data-idx="${i}" rows="3">${escapeHtml(rec.journalAnswers[i] || "")}</textarea>
       `).join("")}
@@ -416,9 +399,7 @@ function renderJournaling(host, d, rec) {
     </div>
   `;
   $("#save-journal").addEventListener("click", () => {
-    $$(".field-textarea", host).forEach(ta => {
-      rec.journalAnswers[Number(ta.dataset.idx)] = ta.value;
-    });
+    $$(".field-textarea", host).forEach(ta => { rec.journalAnswers[Number(ta.dataset.idx)] = ta.value; });
     rec.completedBlocks.journaling = true;
     updateJournalLog(d, rec);
     touchDay(d.day);
@@ -429,20 +410,20 @@ function renderJournaling(host, d, rec) {
 }
 
 function updateJournalLog(d, rec) {
-  const entry = { day: d.day, title: d.title, date: rec.dateTouched || todayISO(), answers: d.prompts.map((p,i) => ({ prompt:p, answer: rec.journalAnswers[i] || "" })) };
+  const entry = { day: d.day, title: d.title, date: rec.dateTouched || todayISO(), answers: d.journaling.prompts.map((p,i) => ({ prompt:p, answer: rec.journalAnswers[i] || "" })) };
   const idx = state.journalLog.findIndex(e => e.day === d.day);
   if (idx >= 0) state.journalLog[idx] = entry; else state.journalLog.push(entry);
 }
 
-/* ---------- Tapping ---------- */
+/* ---------- Tapping (complementario) ---------- */
 
 function renderTapping(host, d, rec) {
   host.innerHTML = `
     <div class="detail-panel">
-      <h2>Tapping de hoy</h2>
-      <p>Utiliza tu práctica habitual durante aproximadamente 5–10 minutos.</p>
-      <p class="detail-sub">${d.tapping}</p>
-      <label class="field-label">¿Qué apareció durante el tapping?</label>
+      <h2>Tapping</h2>
+      <p class="note-small">Complementario — no es parte del método de Joe Dispenza. Usa tu secuencia habitual de puntos EFT.</p>
+      <p class="detail-sub">${d.tapping.instruccion}</p>
+      <label class="field-label">${d.tapping.pregunta}</label>
       <textarea class="field-textarea" id="tapping-note" rows="3">${escapeHtml(rec.tappingNote || "")}</textarea>
       <button class="btn-primary" id="save-tapping">GUARDAR</button>
       ${rec.completedBlocks.tapping ? `<p class="confirm-msg">Guardado.</p>` : ""}
@@ -458,14 +439,48 @@ function renderTapping(host, d, rec) {
   });
 }
 
+/* ---------- Gratitud ---------- */
+
+function renderGratitud(host, d, rec) {
+  host.innerHTML = `
+    <div class="detail-panel">
+      <h2>Gratitud</h2>
+      <p class="detail-sub">${d.gratitud.instruccion}</p>
+      <textarea class="field-textarea" id="gratitud-note" rows="3">${escapeHtml(rec.gratitudNote || "")}</textarea>
+      <button class="btn-primary" data-done="gratitud" id="save-gratitud">GUARDAR</button>
+      ${rec.completedBlocks.gratitud ? `<p class="confirm-msg">Guardado.</p>` : ""}
+    </div>
+  `;
+  $("#save-gratitud").addEventListener("click", () => { rec.gratitudNote = $("#gratitud-note").value; });
+}
+
+/* ---------- Visualización / ensayo mental ---------- */
+
+function renderVisualizacion(host, d, rec) {
+  host.innerHTML = `
+    <div class="detail-panel">
+      <h2>Ensayo mental</h2>
+      <p class="detail-sub">${d.visualizacion.instruccion}</p>
+      ${!rec.visualizacionDone ? `<button class="btn-primary" id="viz-done-btn">HECHO</button>` : `<p class="confirm-msg">Práctica registrada.</p>`}
+    </div>
+  `;
+  $("#viz-done-btn")?.addEventListener("click", () => {
+    rec.visualizacionDone = true;
+    rec.completedBlocks.visualizacion = true;
+    touchDay(d.day);
+    saveState();
+    render();
+  });
+}
+
 /* ---------- Acción ---------- */
 
 function renderAccion(host, d, rec) {
   host.innerHTML = `
     <div class="detail-panel">
-      <h2>Una acción real</h2>
-      <h3 class="action-title">${d.actionTitle}</h3>
-      <p>${d.actionDesc}</p>
+      <h2>Acción</h2>
+      <h3 class="action-title">${d.accion.titulo}</h3>
+      <p>${d.accion.instruccion}</p>
       ${!rec.actionDone ? `<button class="btn-primary" id="mark-action-done">HECHO</button>` : `
         <label class="field-label">¿Qué ocurrió?</label>
         <textarea class="field-textarea" id="action-note" rows="3">${escapeHtml(rec.actionNote || "")}</textarea>
@@ -506,17 +521,8 @@ function renderCierre(host, d, rec) {
       <button class="btn-primary" data-done="cierre" id="close-day-btn">CERRAR EL DÍA</button>
     </div>
   `;
-  $$(".mood-btn", host).forEach(btn => {
-    btn.addEventListener("click", () => {
-      rec.mood = btn.dataset.mood;
-      saveState();
-      render();
-    });
-  });
-  $("#close-day-btn").addEventListener("click", () => {
-    rec.moodNote = $("#mood-note").value;
-    saveState();
-  });
+  $$(".mood-btn", host).forEach(btn => btn.addEventListener("click", () => { rec.mood = btn.dataset.mood; saveState(); render(); }));
+  $("#close-day-btn").addEventListener("click", () => { rec.moodNote = $("#mood-note").value; saveState(); });
 }
 
 function escapeHtml(s) {
@@ -537,7 +543,7 @@ function renderProgreso() {
       <div class="stat-card"><div class="stat-value">${completedDaysCount()}</div><div class="stat-label">Días completados</div></div>
       <div class="stat-card"><div class="stat-value">${streaks.current}</div><div class="stat-label">Racha actual</div></div>
       <div class="stat-card"><div class="stat-value">${streaks.best}</div><div class="stat-label">Mayor racha</div></div>
-      <div class="stat-card"><div class="stat-value">${totalMeditationMinutes()}</div><div class="stat-label">Minutos meditados</div></div>
+      <div class="stat-card"><div class="stat-value">${totalMeditationsDone()}</div><div class="stat-label">Meditaciones realizadas</div></div>
       <div class="stat-card"><div class="stat-value">${totalActions()}</div><div class="stat-label">Acciones completadas</div></div>
       <div class="stat-card"><div class="stat-value">${totalTappingSessions()}</div><div class="stat-label">Sesiones de tapping</div></div>
       <div class="stat-card"><div class="stat-value">${totalJournalDays()}</div><div class="stat-label">Días de journaling</div></div>
@@ -549,7 +555,7 @@ function renderProgreso() {
     <p class="note-small">Estos datos son descriptivos, no diagnósticos.</p>
     <button class="btn-secondary" id="ver-programa">Ver programa completo</button>
   `;
-  $("#ver-programa").addEventListener("click", () => setScreen("programa"));
+  $("#ver-programa").addEventListener("click", () => navigate({ screen: "programa" }));
 }
 
 function renderPrograma() {
@@ -559,7 +565,7 @@ function renderPrograma() {
     <div class="program-list">
       ${WEEKS.map(w => `
         <div class="week-block">
-          <div class="week-heading">Semana ${w.n} · ${w.title}</div>
+          <div class="week-heading">Semana ${w.n} · ${w.title} <span class="weeksub">(${w.subtitle})</span></div>
           ${DAYS.filter(d => d.day >= w.range[0] && d.day <= w.range[1]).map(d => {
             const rec = state.days[String(d.day)];
             const done = rec && rec.dateCompleted;
@@ -572,22 +578,29 @@ function renderPrograma() {
       `).join("")}
     </div>
   `;
-  $("#back-progreso").addEventListener("click", () => setScreen("progreso"));
+  $("#back-progreso").addEventListener("click", () => history.back());
   $$(".program-day", root).forEach(btn => {
     btn.addEventListener("click", () => {
-      openBlockKey = null;
-      setScreen("hoy");
-      // permite consultar cualquier día sin cambiar el día activo de progreso
       const day = Number(btn.dataset.day);
-      viewDayReadOnly(day);
+      navigate({ screen: "hoy", viewDay: day, block: null });
     });
   });
 }
 
-function viewDayReadOnly(day) {
+function renderDiaLectura(day) {
   const d = dayData(day);
   const rec = getDayRecord(day);
   const root = $("#screen-hoy");
+  const journalHtml = d.blocks.includes("journaling") ? `
+      <h2>Journaling</h2>
+      ${d.journaling.prompts.map((p,i) => `<label class="field-label">${p}</label><p class="readonly-answer">${escapeHtml(rec.journalAnswers?.[i] || "—")}</p>`).join("")}` : "";
+  const tappingHtml = d.blocks.includes("tapping") ? `
+      <h2>Tapping</h2>
+      <p class="readonly-answer">${escapeHtml(rec.tappingNote || "—")}</p>` : "";
+  const accionHtml = d.blocks.includes("accion") ? `
+      <h2>Acción</h2>
+      <p><strong>${d.accion.titulo}</strong></p>
+      <p class="readonly-answer">${escapeHtml(rec.actionNote || (rec.actionDone ? "Hecho." : "—"))}</p>` : "";
   root.innerHTML = `
     <header class="hoy-header">
       <button class="btn-back" id="back-from-day">‹ Volver</button>
@@ -596,19 +609,11 @@ function viewDayReadOnly(day) {
     <section class="today-card">
       <div class="weektag">Semana ${weekOf(d.day).n} · ${weekOf(d.day).title}</div>
       <h1 class="daytitle">${d.title}</h1>
-      <p class="daymeta">Meditación sugerida: ${d.meditationLabel}</p>
+      <p class="daymeta">${d.resumen}</p>
     </section>
-    <div class="detail-panel">
-      <h2>Journaling</h2>
-      ${d.prompts.map((p,i) => `<label class="field-label">${p}</label><p class="readonly-answer">${escapeHtml(rec.journalAnswers?.[i] || "—")}</p>`).join("")}
-      <h2>Tapping</h2>
-      <p class="readonly-answer">${escapeHtml(rec.tappingNote || "—")}</p>
-      <h2>Acción</h2>
-      <p><strong>${d.actionTitle}</strong></p>
-      <p class="readonly-answer">${escapeHtml(rec.actionNote || (rec.actionDone ? "Hecho." : "—"))}</p>
-    </div>
+    <div class="detail-panel">${journalHtml}${tappingHtml}${accionHtml}</div>
   `;
-  $("#back-from-day").addEventListener("click", () => setScreen("programa"));
+  $("#back-from-day").addEventListener("click", () => history.back());
 }
 
 /* ---------- Diario ---------- */
@@ -637,46 +642,32 @@ function renderDiario() {
 
 /* ---------- Objetivos ---------- */
 
+const OBJETIVO_FIELDS = [
+  { key:"cambiar", label:"¿Qué quiero cambiar?" },
+  { key:"crear", label:"¿Qué quiero crear?" },
+  { key:"sentir", label:"¿Cómo quiero sentirme?" },
+  { key:"ser", label:"¿Qué tipo de persona quiero ser?" },
+  { key:"resultado", label:"¿Qué resultado concreto quiero conseguir en los próximos meses?" }
+];
+
 function renderObjetivos() {
   const root = $("#screen-objetivos");
   root.innerHTML = `
     <header class="screen-header"><h1>Objetivos</h1></header>
-    ${state.goals.length === 0 ? `<p class="empty-msg">Define hasta 3 objetivos principales para el programa.</p>` : ""}
-    <div class="goal-list">
-      ${state.goals.map((g, i) => `
-        <div class="goal-card">
-          <input class="goal-input goal-name" data-i="${i}" placeholder="Nombre del objetivo" value="${escapeHtml(g.name||"")}">
-          <textarea class="field-textarea goal-desc" data-i="${i}" rows="2" placeholder="Descripción">${escapeHtml(g.desc||"")}</textarea>
-          <textarea class="field-textarea goal-why" data-i="${i}" rows="2" placeholder="¿Por qué es importante?">${escapeHtml(g.why||"")}</textarea>
-          <input class="goal-input goal-next" data-i="${i}" placeholder="Siguiente acción" value="${escapeHtml(g.nextAction||"")}">
-          <select class="goal-status" data-i="${i}">
-            <option value="pendiente" ${g.status==='pendiente'?'selected':''}>Pendiente</option>
-            <option value="en_progreso" ${g.status==='en_progreso'?'selected':''}>En progreso</option>
-            <option value="logrado" ${g.status==='logrado'?'selected':''}>Logrado</option>
-          </select>
-          <textarea class="field-textarea goal-notes" data-i="${i}" rows="2" placeholder="Notas">${escapeHtml(g.notes||"")}</textarea>
-          <button class="btn-ghost goal-remove" data-i="${i}">Eliminar objetivo</button>
-        </div>
+    <p class="note-small">Defínelos al empezar el programa. La aplicación te los recordará en los días que trabajan el futuro y la nueva identidad (a partir de la semana 4).</p>
+    <div class="detail-panel">
+      ${OBJETIVO_FIELDS.map(f => `
+        <label class="field-label">${f.label}</label>
+        <textarea class="field-textarea objetivo-field" data-key="${f.key}" rows="2">${escapeHtml(state.objetivos[f.key] || "")}</textarea>
       `).join("")}
+      <button class="btn-primary" id="save-objetivos">GUARDAR OBJETIVOS</button>
     </div>
-    ${state.goals.length < 3 ? `<button class="btn-secondary" id="add-goal">Añadir objetivo</button>` : `<p class="note-small">Máximo 3 objetivos principales.</p>`}
   `;
-  $("#add-goal")?.addEventListener("click", () => {
-    state.goals.push({ name:"", desc:"", why:"", nextAction:"", status:"pendiente", notes:"" });
+  $("#save-objetivos").addEventListener("click", () => {
+    $$(".objetivo-field", root).forEach(ta => { state.objetivos[ta.dataset.key] = ta.value; });
     saveState();
-    render();
+    toast("Objetivos guardados.");
   });
-  $$(".goal-remove", root).forEach(btn => btn.addEventListener("click", () => {
-    state.goals.splice(Number(btn.dataset.i), 1);
-    saveState();
-    render();
-  }));
-  const bind = (cls, field) => $$(cls, root).forEach(el => el.addEventListener("change", () => {
-    state.goals[Number(el.dataset.i)][field] = el.value;
-    saveState();
-  }));
-  bind(".goal-name","name"); bind(".goal-desc","desc"); bind(".goal-why","why");
-  bind(".goal-next","nextAction"); bind(".goal-status","status"); bind(".goal-notes","notes");
 }
 
 /* ---------- Más ---------- */
@@ -704,21 +695,21 @@ function renderMas() {
     </section>
 
     <section class="more-section">
+      <h2>Sobre el contenido</h2>
+      <p class="note-small">La estructura de las 4 etapas está basada en el proceso de 7 pasos del libro "Deja de ser tú" de Joe Dispenza (resumido con palabras propias). La meditación de audio usada por defecto es de un canal de YouTube en español inspirado en ese libro — no es una grabación oficial de Joe Dispenza. El tapping es un complemento ajeno a su método. Puedes ver el detalle completo de las fuentes al principio del archivo data.js de esta app.</p>
+    </section>
+
+    <section class="more-section">
       <h2>Privacidad</h2>
       <p>Tu información se guarda únicamente en este dispositivo. No se usan trackers, publicidad, cuentas ni cookies innecesarias.</p>
     </section>
 
     <section class="more-section">
-      <p class="note-small">Este programa es una herramienta personal de reflexión, meditación, hábitos y desarrollo personal. No constituye atención médica, psicológica o financiera profesional. Los ejercicios de visualización se utilizan como práctica personal, no como afirmaciones científicas.</p>
+      <p class="note-small">Este programa es una herramienta personal de reflexión, meditación, hábitos y desarrollo personal. No constituye atención médica, psicológica o financiera profesional.</p>
     </section>
   `;
 
-  $("#reminder-time").addEventListener("change", (e) => {
-    state.reminderTime = e.target.value;
-    saveState();
-    toast("Hora guardada.");
-  });
-
+  $("#reminder-time").addEventListener("change", (e) => { state.reminderTime = e.target.value; saveState(); toast("Hora guardada."); });
   $("#export-progress").addEventListener("click", exportProgressJSON);
   $("#export-journal").addEventListener("click", exportJournalText);
   $("#reset-program").addEventListener("click", confirmReset);
@@ -730,17 +721,12 @@ function exportProgressJSON() {
 }
 
 function exportJournalText() {
-  const lines = [];
-  lines.push("MI TRANSFORMACIÓN — DIARIO");
-  lines.push("");
+  const lines = ["MI TRANSFORMACIÓN — DIARIO", ""];
   const entries = [...state.journalLog].sort((a,b) => a.day - b.day);
   entries.forEach(e => {
     lines.push(`Día ${e.day} — ${e.title} (${e.date})`);
     e.answers.forEach(a => {
-      if (a.answer && a.answer.trim()) {
-        lines.push(`P: ${a.prompt}`);
-        lines.push(`R: ${a.answer}`);
-      }
+      if (a.answer && a.answer.trim()) { lines.push(`P: ${a.prompt}`); lines.push(`R: ${a.answer}`); }
     });
     lines.push("");
   });
@@ -777,7 +763,9 @@ function confirmReset() {
 
 function init() {
   $$(".navitem").forEach(btn => btn.addEventListener("click", () => setScreen(btn.dataset.screen)));
-  setScreen("hoy");
+  applyNavState({ screen: "hoy", block: null, viewDay: null });
+  render();
+  history.replaceState(navState(), "", location.href);
 
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
