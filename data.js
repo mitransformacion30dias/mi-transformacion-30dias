@@ -38,7 +38,10 @@
        Semana 1 — "Inducción de las partes del cuerpo — Semana 1"
          Duración confirmada: 11:21. Es SOLO inducción (así la titula la
          propia autora) — no la práctica completa de la semana.
-         URL: https://creators.spotify.com/pod/profile/solmurias/episodes/Induccin-de-las-partes-del-cuerpo---Semana-1---Joe-Dispenza---Meditaciones-Deja-de-ser-t-e1auqr8
+         URL directa al episodio NO fiable (llevaba a una página de
+         panel de creador, no de escucha pública — confirmado roto por
+         la propia usuaria). Se enlaza a la lista de reproducción real:
+         https://open.spotify.com/playlist/7bIZ7De2O7DCKh1wgeDybp
 
        Semana 2 — "Meditación guiada — Semana 2"
          Duración confirmada: 11:59. Meditación completa (incluye inducción).
@@ -119,7 +122,8 @@ const RESOURCES = {
     idioma: "Español",
     duracion: "11:21",
     alcance: "Solo inducción (no la práctica completa de la semana)",
-    url: "https://creators.spotify.com/pod/profile/solmurias/episodes/Induccin-de-las-partes-del-cuerpo---Semana-1---Joe-Dispenza---Meditaciones-Deja-de-ser-t-e1auqr8",
+    url: "https://open.spotify.com/playlist/7bIZ7De2O7DCKh1wgeDybp",
+    urlNota: "El enlace directo al episodio individual no es fiable (lleva a una página de creador, no de escucha). El botón abre la lista de reproducción real donde está publicado; busca \"Inducción de las partes del cuerpo — Semana 1\".",
     objetivo: "Pasar de Beta a Alfa/Theta llevando la atención a las partes del cuerpo \"en el espacio\", tal como describe el libro."
   },
   "semana2-meditacion": {
