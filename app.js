@@ -9,6 +9,7 @@ const BLOCK_LABELS = {
   intencion: "Intención del día",
   meditacion: "Meditación",
   journaling: "Journaling",
+  duranteeldia: "Durante el día",
   tapping: "Tapping",
   gratitud: "Gratitud",
   visualizacion: "Ensayo mental",
@@ -346,6 +347,7 @@ function renderBlockDetail(key, d, rec) {
       </div>`;
   } else if (key === "meditacion") renderMeditacion(host, d, rec);
   else if (key === "journaling") renderJournaling(host, d, rec);
+  else if (key === "duranteeldia") renderDuranteElDia(host, d, rec);
   else if (key === "tapping") renderTapping(host, d, rec);
   else if (key === "gratitud") renderGratitud(host, d, rec);
   else if (key === "visualizacion") renderVisualizacion(host, d, rec);
@@ -368,16 +370,32 @@ function renderMeditacion(host, d, rec) {
         <div class="resource-row"><span class="resource-label">Tipo</span><span class="resource-tag ${res.tipo}">${res.tipoLabel}</span></div>
         <div class="resource-row"><span class="resource-label">Idioma</span><span>${res.idioma}</span></div>
         <div class="resource-row"><span class="resource-label">Duración</span><span>${res.duracion}</span></div>
+        <div class="resource-row"><span class="resource-label">Contenido</span><span>${res.alcance}</span></div>
         <p class="resource-objetivo">${res.objetivo}</p>
+        ${res.urlNota ? `<p class="note-small resource-url-note">${res.urlNota}</p>` : ""}
         <a class="btn-primary resource-link" href="${res.url}" target="_blank" rel="noopener">INICIAR MEDITACIÓN</a>
       </div>
-      ${d.meditacionExtra ? `<div class="meditacion-extra"><p class="detail-sub">Después de la grabación:</p><p>${escapeHtml(d.meditacionExtra)}</p></div>` : ""}
+      ${d.meditacionExtra ? `<div class="meditacion-extra"><p class="detail-sub">Durante o después de la grabación:</p><p>${escapeHtml(d.meditacionExtra)}</p></div>` : ""}
       <p class="note-small"><a href="${RESOURCES["oficial-playlist"].url}" target="_blank" rel="noopener">Prefiero la meditación oficial gratuita de Joe Dispenza (en inglés) →</a></p>
       <button class="btn-secondary" data-done="meditacion" id="med-done-btn">Ya he practicado</button>
       ${rec.completedBlocks.meditacion ? `<p class="confirm-msg">Práctica registrada.</p>` : ""}
     </div>
   `;
   $("#med-done-btn").addEventListener("click", () => { rec.meditationDone = true; });
+}
+
+/* ---------- Durante el día (etapa 3: conecta meditación con vida real) ---------- */
+
+function renderDuranteElDia(host, d, rec) {
+  host.innerHTML = `
+    <div class="detail-panel">
+      <h2>Durante el día</h2>
+      <p class="detail-sub">Esto es lo que haces fuera de la meditación, con lo trabajado hoy sentada.</p>
+      <p>${d.duranteeldia.instruccion}</p>
+      <button class="btn-secondary" data-done="duranteeldia">Marcar como leído</button>
+      ${rec.completedBlocks.duranteeldia ? `<p class="confirm-msg">Registrado.</p>` : ""}
+    </div>
+  `;
 }
 
 /* ---------- Journaling ---------- */
@@ -699,7 +717,20 @@ function renderMas() {
 
     <section class="more-section">
       <h2>Sobre el contenido</h2>
-      <p class="note-small">La estructura de las 4 etapas está basada en el proceso de 7 pasos del libro "Deja de ser tú" de Joe Dispenza (resumido con palabras propias). La meditación de audio usada por defecto es de un canal de YouTube en español inspirado en ese libro — no es una grabación oficial de Joe Dispenza. El tapping es un complemento ajeno a su método. Puedes ver el detalle completo de las fuentes al principio del archivo data.js de esta app.</p>
+      <p class="note-small">La estructura de las 4 etapas está basada en el proceso de 7 pasos del libro "Deja de ser tú" de Joe Dispenza (resumido con palabras propias). La meditación de audio de cada semana es de un canal en español inspirado en ese libro — no son grabaciones oficiales de Joe Dispenza. El tapping es un complemento ajeno a su método. Puedes ver el detalle completo de las fuentes al principio del archivo data.js de esta app.</p>
+    </section>
+
+    <section class="more-section">
+      <h2>Después de los 30 días</h2>
+      <p class="note-small">Si quieres continuar, Joe Dispenza suele recomendar seguir con estas meditaciones oficiales suyas (productos de pago, no verificados con enlace gratuito aquí — solo el nombre para que las busques si te interesa):</p>
+      <ul class="continuity-list">
+        <li>You Are the Placebo — Meditation #1</li>
+        <li>The Generous Present Moment</li>
+        <li>Blessing of the Energy Centers I</li>
+        <li>Tuning in to New Potentials</li>
+        <li>Reconditioning the Body to a New Mind</li>
+        <li>Changing Beliefs and Perceptions</li>
+      </ul>
     </section>
 
     <section class="more-section">
