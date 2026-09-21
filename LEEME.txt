@@ -1,0 +1,24 @@
+MI TRANSFORMACIÓN — 30 DÍAS
+Instalación en GitHub Pages (igual que Centro Tapping)
+
+1. Crea un repositorio nuevo en GitHub (o una carpeta dentro de uno existente).
+2. Sube estos archivos tal cual, sin cambiar nombres ni rutas:
+   index.html
+   styles.css
+   data.js
+   app.js
+   manifest.json
+   sw.js
+   icon-192.png
+   icon-192-maskable.png
+   icon-512.png
+   icon-512-maskable.png
+3. Activa GitHub Pages para ese repositorio (Settings → Pages → rama main).
+4. Abre la URL resultante en Safari desde el iPhone.
+5. Compartir → Añadir a pantalla de inicio.
+
+Notas:
+- Todo el contenido y el progreso se guardan solo en el dispositivo (localStorage). No hay servidor, ni cuentas, ni datos que salgan del teléfono.
+- Tras la primera carga, la app funciona sin conexión.
+- Los iconos son un diseño propio, sin ningún elemento de marca de terceros.
+- El contenido de los 30 días (data.js) es original, redactado a partir de principios generales de meditación, journaling y tapping — no reproduce textos, guiones ni audios de ningún autor.

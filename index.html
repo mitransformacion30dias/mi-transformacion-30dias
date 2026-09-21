@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mi Transformación</title>
+<meta name="description" content="30 días de enfoque, práctica y acción.">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#3A332C">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Mi Transformación">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="icon-192.png">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="app">
+
+  <section id="screen-hoy" class="screen"></section>
+
+  <section id="screen-progreso" class="screen"></section>
+
+  <section id="screen-diario" class="screen"></section>
+
+  <section id="screen-objetivos" class="screen"></section>
+
+  <section id="screen-mas" class="screen"></section>
+
+  <section id="screen-programa" class="screen"></section>
+
+  <div id="toast"></div>
+</div>
+
+<nav class="bottomnav">
+  <button class="navitem" data-screen="hoy"><span class="navdot"></span>HOY</button>
+  <button class="navitem" data-screen="progreso"><span class="navdot"></span>PROGRESO</button>
+  <button class="navitem" data-screen="diario"><span class="navdot"></span>DIARIO</button>
+  <button class="navitem" data-screen="objetivos"><span class="navdot"></span>OBJETIVOS</button>
+  <button class="navitem" data-screen="mas"><span class="navdot"></span>MÁS</button>
+</nav>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
