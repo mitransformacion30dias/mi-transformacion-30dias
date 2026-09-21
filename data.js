@@ -418,7 +418,7 @@ const DAYS = [
     "Completa 5 veces: \"Soy una persona que...\" (conductas reales, no fantasías)",
     "¿Cuál de esas 5 frases es la más urgente de empezar a vivir?"
   ]},
-  gratitud:{ instruccion:"Agradece por adelantado, como si ya fueras esa persona, una cosa concreta de tu día de hoy." },
+  gratitud:{ tema:"Gratitud hacia ti misma", instruccion:"Agradece por adelantado, como si ya fueras esa persona, una cosa concreta de tu día de hoy." },
   accion:{ titulo:"Acción de hoy", instruccion:"Actúa según la frase más urgente que has elegido, en una situación real de hoy." } },
 
 { day:23, title:"Ensayo mental de una situación", resumen:"El ensayo mental es imaginar con detalle cómo actuarías distinto en una situación concreta, antes de que ocurra.",
@@ -429,7 +429,7 @@ const DAYS = [
     "¿Cómo reaccionaría la persona que definiste ayer?"
   ]},
   visualizacion:{ instruccion:"Cierra los ojos 3-5 minutos y repasa la situación paso a paso: cómo entras, qué dices, cómo te sientes, cómo actúas distinto. Hazlo despacio, con el mayor detalle posible." },
-  gratitud:{ instruccion:"Agradece por adelantado como si esa situación ya hubiera salido bien." },
+  gratitud:{ tema:"Gratitud anticipada", instruccion:"Agradece por adelantado como si esa situación ya hubiera salido bien." },
   accion:{ titulo:"Acción de hoy", instruccion:"Cuando llegue esa situación real, aplica lo ensayado." } },
 
 { day:24, title:"La emoción antes del resultado", resumen:"Dispenza insiste en sentir la emoción elevada (gratitud, por ejemplo) antes de que el resultado exista, como combustible del cambio.",
@@ -440,7 +440,7 @@ const DAYS = [
     "¿Qué emoción elevada eliges hoy para tu ensayo?",
     "¿En qué parte del cuerpo la notas cuando la sientes de verdad?"
   ]},
-  gratitud:{ instruccion:"Agradece tres cosas de tu vida actual, sintiendo la emoción de verdad, no solo enumerando." },
+  gratitud:{ tema:"Gratitud y emoción elevada", instruccion:"Agradece tres cosas de tu vida actual, sintiendo la emoción de verdad, no solo enumerando." },
   accion:{ titulo:"Acción de hoy", instruccion:"Elige una tarea de hoy y hazla sosteniendo esa emoción elevada, no la emoción con la que sueles hacerla." } },
 
 { day:25, title:"Ensayo mental de un día completo", resumen:"Ampliando el ensayo: en vez de una situación, un día entero de tu futuro.",
@@ -469,7 +469,7 @@ const DAYS = [
     "De todo lo practicado (meditación, journaling, tapping, ensayo mental), ¿qué te está ayudando más a mantenerte centrada?",
     "¿Qué prácticas vas a dejar y cuáles quieres conservar?"
   ]},
-  gratitud:{ instruccion:"Agradece algo del propio proceso de estos 27 días." } },
+  gratitud:{ tema:"Gratitud por el proceso", instruccion:"Agradece algo del propio proceso de estos 27 días." } },
 
 { day:28, title:"Tu sistema de mantenimiento", resumen:"Elige, como máximo, 3 prácticas para sostener después del Día 30.",
   blocks:["intencion","meditacion","journaling","accion","cierre"],
@@ -498,5 +498,5 @@ const DAYS = [
     "¿Qué aprendiste sobre ti misma?",
     "¿Qué sigue frenándote, y qué vas a hacer con eso en los próximos 90 días?"
   ]},
-  gratitud:{ instruccion:"Agradece el haber sostenido el programa hasta hoy, sea cual sea el resultado." } }
+  gratitud:{ tema:"Gratitud de cierre", instruccion:"Agradece el haber sostenido el programa hasta hoy, sea cual sea el resultado." } }
 ];

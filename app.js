@@ -464,18 +464,49 @@ function renderTapping(host, d, rec) {
 }
 
 /* ---------- Gratitud ---------- */
+/* Estructura de campos inspirada en tu plantilla personal de gratitud diaria
+   (cómo te sientes, afirmación, 3 agradecimientos, tiempo para ti) — texto
+   propio, sin copiar el contenido de tus PDF. */
 
 function renderGratitud(host, d, rec) {
+  if (!rec.gratitudData) {
+    rec.gratitudData = { siento: "", afirmacion: "", por1: "", por2: "", por3: "", moverCuerpo: false, autocuidado: false };
+  }
+  const g = rec.gratitudData;
   host.innerHTML = `
     <div class="detail-panel">
       <h2>Gratitud</h2>
-      <p class="detail-sub">${d.gratitud.instruccion}</p>
-      <textarea class="field-textarea" id="gratitud-note" rows="3">${escapeHtml(rec.gratitudNote || "")}</textarea>
+      ${d.gratitud.tema ? `<p class="detail-sub">${d.gratitud.tema}</p>` : ""}
+      <p>${d.gratitud.instruccion}</p>
+
+      <label class="field-label">Hoy me siento... (en 2-3 palabras)</label>
+      <input class="goal-input" id="g-siento" value="${escapeHtml(g.siento)}">
+
+      <label class="field-label">Afirmación positiva de hoy</label>
+      <textarea class="field-textarea" id="g-afirmacion" rows="2">${escapeHtml(g.afirmacion)}</textarea>
+
+      <label class="field-label">Hoy me siento agradecida por...</label>
+      <input class="goal-input" id="g-por1" placeholder="1." value="${escapeHtml(g.por1)}">
+      <input class="goal-input" id="g-por2" placeholder="2." value="${escapeHtml(g.por2)}">
+      <input class="goal-input" id="g-por3" placeholder="3." value="${escapeHtml(g.por3)}">
+
+      <label class="field-label">Hoy he hecho tiempo para...</label>
+      <label class="check-label"><input type="checkbox" id="g-mover" ${g.moverCuerpo?"checked":""}> Mover el cuerpo</label>
+      <label class="check-label"><input type="checkbox" id="g-auto" ${g.autocuidado?"checked":""}> Un momento de autocuidado</label>
+
       <button class="btn-primary" data-done="gratitud" id="save-gratitud">GUARDAR</button>
       ${rec.completedBlocks.gratitud ? `<p class="confirm-msg">Guardado.</p>` : ""}
     </div>
   `;
-  $("#save-gratitud").addEventListener("click", () => { rec.gratitudNote = $("#gratitud-note").value; });
+  $("#save-gratitud").addEventListener("click", () => {
+    g.siento = $("#g-siento").value;
+    g.afirmacion = $("#g-afirmacion").value;
+    g.por1 = $("#g-por1").value;
+    g.por2 = $("#g-por2").value;
+    g.por3 = $("#g-por3").value;
+    g.moverCuerpo = $("#g-mover").checked;
+    g.autocuidado = $("#g-auto").checked;
+  });
 }
 
 /* ---------- Visualización / ensayo mental ---------- */
