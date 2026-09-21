@@ -279,7 +279,7 @@ function renderHoy() {
 
     ${allDone ? `<div class="daydone">Día completado. Mañana continuamos.</div>` : ""}
 
-    ${openBlockKey ? `<button class="btn-back" id="close-block">‹ Cerrar</button>` : ""}
+    ${openBlockKey ? `<button class="btn-back" id="close-block">‹ Atrás</button>` : ""}
     <div id="block-detail" class="block-detail"></div>
   `;
 
@@ -537,7 +537,7 @@ function renderProgreso() {
   const streaks = computeStreaks();
   const mood = averageMood();
   root.innerHTML = `
-    <header class="screen-header"><h1>Progreso</h1></header>
+    <header class="screen-header"><button class="btn-back" id="atras-progreso">‹ Atrás</button><h1>Progreso</h1></header>
     <div class="stats-grid">
       <div class="stat-card"><div class="stat-value">${pct}%</div><div class="stat-label">Programa completado</div></div>
       <div class="stat-card"><div class="stat-value">${completedDaysCount()}</div><div class="stat-label">Días completados</div></div>
@@ -555,6 +555,7 @@ function renderProgreso() {
     <p class="note-small">Estos datos son descriptivos, no diagnósticos.</p>
     <button class="btn-secondary" id="ver-programa">Ver programa completo</button>
   `;
+  $("#atras-progreso").addEventListener("click", () => history.back());
   $("#ver-programa").addEventListener("click", () => navigate({ screen: "programa" }));
 }
 
@@ -622,7 +623,7 @@ function renderDiario() {
   const root = $("#screen-diario");
   const entries = [...state.journalLog].sort((a,b) => b.day - a.day);
   root.innerHTML = `
-    <header class="screen-header"><h1>Diario</h1></header>
+    <header class="screen-header"><button class="btn-back" id="atras-diario">‹ Atrás</button><h1>Diario</h1></header>
     ${entries.length === 0 ? `<p class="empty-msg">Todavía no hay reflexiones guardadas.</p>` : `
       <div class="journal-list">
         ${entries.map(e => `
@@ -638,6 +639,7 @@ function renderDiario() {
       </div>
     `}
   `;
+  $("#atras-diario").addEventListener("click", () => history.back());
 }
 
 /* ---------- Objetivos ---------- */
@@ -653,7 +655,7 @@ const OBJETIVO_FIELDS = [
 function renderObjetivos() {
   const root = $("#screen-objetivos");
   root.innerHTML = `
-    <header class="screen-header"><h1>Objetivos</h1></header>
+    <header class="screen-header"><button class="btn-back" id="atras-objetivos">‹ Atrás</button><h1>Objetivos</h1></header>
     <p class="note-small">Defínelos al empezar el programa. La aplicación te los recordará en los días que trabajan el futuro y la nueva identidad (a partir de la semana 4).</p>
     <div class="detail-panel">
       ${OBJETIVO_FIELDS.map(f => `
@@ -663,6 +665,7 @@ function renderObjetivos() {
       <button class="btn-primary" id="save-objetivos">GUARDAR OBJETIVOS</button>
     </div>
   `;
+  $("#atras-objetivos").addEventListener("click", () => history.back());
   $("#save-objetivos").addEventListener("click", () => {
     $$(".objetivo-field", root).forEach(ta => { state.objetivos[ta.dataset.key] = ta.value; });
     saveState();
@@ -675,7 +678,7 @@ function renderObjetivos() {
 function renderMas() {
   const root = $("#screen-mas");
   root.innerHTML = `
-    <header class="screen-header"><h1>Más</h1></header>
+    <header class="screen-header"><button class="btn-back" id="atras-mas">‹ Atrás</button><h1>Más</h1></header>
 
     <section class="more-section">
       <h2>Hora preferida de práctica</h2>
@@ -709,6 +712,7 @@ function renderMas() {
     </section>
   `;
 
+  $("#atras-mas").addEventListener("click", () => history.back());
   $("#reminder-time").addEventListener("change", (e) => { state.reminderTime = e.target.value; saveState(); toast("Hora guardada."); });
   $("#export-progress").addEventListener("click", exportProgressJSON);
   $("#export-journal").addEventListener("click", exportJournalText);
